@@ -8,6 +8,9 @@ import { GoogleStrategy } from './google/google.strategy';
 import { ConfigModule } from '@nestjs/config';
 import { JwtStrategy } from './jwt-strategy';
 import { AuthService } from './auth.service';
+import { UsersService } from 'src/users/users.service';
+import { userProviders } from 'src/database/user.provider';
+import { databaseProviders } from 'src/database/database.provider';
 
 @Module({
   imports: [
@@ -19,7 +22,15 @@ import { AuthService } from './auth.service';
       signOptions: { expiresIn: '1h' },
     }),
   ],
-  providers: [AuthService, GoogleAuthService, GoogleStrategy, JwtStrategy],
+  providers: [
+    AuthService,
+    GoogleAuthService,
+    GoogleStrategy,
+    JwtStrategy,
+    UsersService,
+    ...userProviders,
+    ...databaseProviders,
+  ],
   controllers: [GoogleAuthController],
   exports: [],
 })

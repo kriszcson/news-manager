@@ -3,6 +3,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Model } from 'mongoose';
 import { Post } from './entities/post.entity';
+import { Headers } from 'src/decorators/headers.decorator';
 
 @Injectable()
 export class PostService {
@@ -10,8 +11,13 @@ export class PostService {
     @Inject('POST_MODEL')
     private postModel: Model<Post>,
   ) {}
-  create(createPostDto: CreatePostDto) {
-    return this.postModel.create(createPostDto);
+  create(headers: Headers, createPostDto: CreatePostDto) {
+    const newPost: Post = {
+      ...createPostDto,
+      author: headers.user.name,
+      imageUrl: headers.user.imageUrl,
+    };
+    return this.postModel.create(newPost);
   }
 
   findAll() {

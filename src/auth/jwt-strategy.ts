@@ -1,17 +1,19 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { jwtConstants } from './auth.constans';
+import { UsersService } from 'src/users/users.service';
 
 export type JwtPayload = {
-  sub: string;
   email: string;
+  id: string;
+  name: string;
+  imageUrl: string;
 };
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor(private readonly configService: ConfigService) {
+  constructor(private readonly userService: UsersService) {
     const extractJwtFromCookie = (req) => {
       let token = null;
       if (req && req.headers) {
@@ -28,14 +30,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: JwtPayload) {
-    //TODO: Implement
-    /*     const user = await this.userRepository.findOne({ id: payload.sub });
+    const user = await this.userService.findByEmail(payload.email);
+    if (!user) throw new UnauthorizedException();
 
-    if (!user) throw new UnauthorizedException('Please log in to continue');
- */
-    return {
-      id: payload.sub,
-      email: payload.email,
-    };
+    return user;
   }
 }

@@ -2,6 +2,7 @@ import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GoogleAuthService } from './google.auth.service';
 import { AuthService } from '../auth.service';
+import { GoogleUser } from './google.user';
 
 @Controller('google')
 export class GoogleAuthController {
@@ -18,12 +19,7 @@ export class GoogleAuthController {
   @Get('redirect')
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() request) {
+    const user = request.user as GoogleUser;
     return this.authService.signIn(request.user);
-  }
-
-  @Get('profile')
-  @UseGuards(AuthGuard('jwt'))
-  test(@Query('email') query) {
-    return this.authService.findUserByEmail(query);
   }
 }

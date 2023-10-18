@@ -1,52 +1,45 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserDTO } from 'src/user/user.dto';
+import { GoogleUser } from './google/google.user';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
-  users = [
-    {
-      id: '1',
-      email: 'abelkrisztian7@gmail.com',
-      firstName: 'Krisztián',
-      lastName: 'Ábel',
-    },
-  ];
-
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private userService: UsersService,
+  ) {}
 
   generateJwt(payload) {
     return this.jwtService.sign(payload);
   }
 
-  async signIn(user: UserDTO) {
+  async signIn(user: GoogleUser) {
     if (!user) {
       throw new BadRequestException('Unauthenticated');
     }
 
-    const userExists = await this.findUserByEmail(user.email);
-
-    if (!userExists) {
-      return this.registerUser(user);
+    const userExists = await this.userService.findByEmail(user.email);
+    if (userExists) {
+      const payload = {
+        email: userExists.email,
+        name: userExists.name,
+        imageUrl: user.picture,
+      };
+      return this.jwtService.sign(payload);
     }
 
-    return this.generateJwt({
-      sub: userExists.id,
-      email: userExists.email,
+    const newUser = await this.userService.create({
+      name: user.lastName + ' ' + user.firstName,
+      email: user.email,
+      imageUrl: user.picture,
     });
-  }
-
-  async registerUser(user: UserDTO) {
-    //TODO: implement
-  }
-
-  async findUserByEmail(email: string) {
-    /*   const user = await this.userService.findOne({ email})  */
-    const user = this.users.find((user) => user.email === email);
-    if (!user) {
-      return null;
-    }
-
-    return user;
+    const payload = {
+      name: newUser.name,
+      email: newUser.email,
+      imageUrl: newUser.imageUrl,
+    };
+    return this.jwtService.sign(payload);
   }
 }

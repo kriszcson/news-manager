@@ -37,9 +37,15 @@ Ezután a visszakapott (ez már JWT) tokent a CRUD hívások headerjébe kell el
 
 ## Fejlesztendő/nice to have
 
--Swagger készítése az alkalmazáshoz
--user kiolvasása a tokenből a postok kezeléséhez
--Konténerizáció
+# Authorizáció megvalósítása (user role-ok bevezetésével)
+
+`admin role`: Bármely user adatait módosíthatja, a usert törölheti. Saját nevében posztot hozhat létre. Minden posztot láthat, és módosíthat/törölhet.
+`writer role`: Saját adatait módosíthatja. Minden posztot láthat. Saját nevében posztot hozhat létre. Saját posztjait módosíthatja, törölheti.
+`reader role`: Bármely posztot láthat.
+
+# Swagger készítése az alkalmazáshoz
+
+# Konténerizáció
 
 Köszi,
 Ábel Krisztián

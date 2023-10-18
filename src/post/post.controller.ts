@@ -12,15 +12,20 @@ import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { HeadersDecorator, Headers } from 'src/decorators/headers.decorator';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('posts')
+@UseGuards(AuthGuard('jwt'))
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Post()
-  create(@Body() createPostDto: CreatePostDto) {
-    return this.postService.create(createPostDto);
+  create(
+    @HeadersDecorator() headers: Headers,
+    @Body() createPostDto: CreatePostDto,
+  ) {
+    return this.postService.create(headers, createPostDto);
   }
 
   @Get()
